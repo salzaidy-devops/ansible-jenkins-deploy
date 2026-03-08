@@ -1,3 +1,23 @@
+# ---
+# plugin: amazon.aws.aws_ec2
+# regions:
+#   - us-east-1
+#   - us-east-2
+#   - us-west-1
+#   - us-west-2
+
+# filters:
+#   # filter instance that is dev, not prod
+#   # tag:Name: dev*
+#   # instance-state-name: running
+
+# # group instance by tags OR instance_type as example
+# # then use this group insteas of pointing to all instances
+# keyed_groups:
+#   - key: tags # 
+#     prefix: tag
+#   - key: instance_type
+#     prefix: instance_type 
 ---
 plugin: amazon.aws.aws_ec2
 regions:
@@ -7,16 +27,17 @@ regions:
   - us-west-2
 
 filters:
-  # filter instance that is dev, not prod
-  # tag:Name: dev*
-  # instance-state-name: running
+  instance-state-name: running
 
-# group instance by tags OR instance_type as example
-# then use this group insteas of pointing to all instances
+hostnames:
+  - instance-id
+
+compose:
+  ansible_host: public_ip_address
+
 keyed_groups:
-  - key: tags # 
+  - key: tags
     prefix: tag
   - key: instance_type
-    prefix: instance_type 
-
+    prefix: instance_type
 

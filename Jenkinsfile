@@ -114,20 +114,21 @@ pipeline {
                 script {
                     echo "Running Ansible Playbook on Ansible server to configure EC2 instances..."
 
-                    def remoteCommand = [:]
-                    remoteCommand.name = 'ansible_server'
-                    remoteCommand.host = '104.131.175.93'
-                    remoteCommand.allowAnyHosts = true
-
                     withCredentials([
                         sshUserPrivateKey(
                             credentialsId: 'ansible_server_key',
                             keyFileVariable: 'SSH_KEY_FILE',
-                            usernameVariable: 'SSH_USER'
+                            usernameVariable: 'SSH_USER',
+                            passphraseVariable: 'SSH_PASSPHRASE'
                         )
                     ]) {
-                        remoteCommand.identityFile = SSH_KEY_FILE
+                        def remoteCommand = [:]
+                        remoteCommand.name = 'ansible_server'
+                        remoteCommand.host = '104.131.175.93'
                         remoteCommand.user = SSH_USER
+                        remoteCommand.identityFile = SSH_KEY_FILE
+                        remoteCommand.passphrase = SSH_PASSPHRASE
+                        remoteCommand.allowAnyHosts = true
 
                         sshCommand remote: remoteCommand, command: 'ls -l /root'
                     }

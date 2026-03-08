@@ -1,0 +1,106 @@
+---
+- name: wait for SSH to be available on EC2 instances
+  hosts: aws_ec2
+  gather_facts: no
+  connection: local
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+
+  vars_files:
+    - day_inve_vars.yaml
+
+  tasks:
+    - name: Wait for SSH to be available
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 700
+        host: "{{ ansible_host | default(inventory_hostname) }}"
+
+  
+        
+
+# This Ansible playbook installs Docker and Docker Compose on AWS EC2 instances.
+- name: Install Docker and prerequisites
+  hosts: aws_ec2
+  become: yes
+  gather_facts: yes
+
+  vars_files:
+    - day_inve_vars.yaml
+
+  
+
+  tasks:
+    - debug:
+        msg: "This server is {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}"
+
+    - name: Install Docker
+      yum:
+        name: docker
+        update_cache: yes
+        state: present
+
+    - name: Get Docker version
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - debug:
+        msg: "Installed Docker version: {{ docker_version.stdout }}"
+
+    - name: Ensure Docker service is started and enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+# Install Docker Compose using the official Docker Compose plugin, 
+# which is compatible with the latest versions of Docker and provides better integration with the Docker CLI. 
+# This method is more reliable and future-proof compared to downloading a standalone binary.
+- name: Install Docker Compose
+  hosts: aws_ec2
+  become: yes
+
+  vars_files:
+    - day_inve_vars.yaml
+
+  vars:
+    docker_compose_plugin_dir: "/usr/local/lib/docker/cli-plugins"
+
+  tasks:
+    - name: Create directory for Docker Compose binary
+      file:
+        path: "{{ docker_compose_plugin_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Get OS name for Docker Compose
+      shell: uname -s
+      register: os_output
+    - debug:
+        msg: "Detected OS: {{ os_output.stdout }}"
+    
+
+    - name: Get Architecture and OS for Docker Compose
+      shell: uname -m
+      register: arch_output
+    - debug:
+        msg: "Detected Architecture: {{ arch_output.stdout }}"
+
+
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-{{ os_output.stdout }}-{{ arch_output.stdout }}"
+        # url: "{{ docker_compose_url }}"
+        dest: "{{ docker_compose_plugin_dir }}/docker-compose"
+        mode: "0755"
+    
+    - name: Verify Docker Compose installation
+      command: docker compose version
+      register: compose_version
+      changed_when: false
+    
+    - debug:
+        msg: "Docker Compose version: {{ compose_version.stdout }}"

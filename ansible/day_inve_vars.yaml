@@ -1,0 +1,8 @@
+docker_compose_version: v2.27.0
+dockerhub_username: salzaidy
+# dockerhub_token: "{{ vault_dockerhub_token }}"
+# dockerhub_password: "{{ vault_dockerhub_password }}"
+# dockerhub_repository: salzaidy/spring-mysql-users
+# dockerhub_image: "{{ dockerhub_repository }}:latest"
+docker_compose__file_path: /Users/alzaidy/IdeaProjects/DevOps/all_apps/spring-mysql-users/docker-compose.yml
+new_user: alzaidy

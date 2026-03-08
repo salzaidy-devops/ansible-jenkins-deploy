@@ -1,29 +1,29 @@
----
-- name: wait for SSH to be available on EC2 instances
-  hosts: aws_ec2
-  gather_facts: no
-  connection: local
+# ---
+# - name: wait for SSH to be available on EC2 instances
+#   hosts: aws_ec2
+#   gather_facts: no
+#   connection: local
 
-  vars:
-    ansible_python_interpreter: /usr/bin/python3
+#   vars:
+#     ansible_python_interpreter: /usr/bin/python3
 
-  vars_files:
-    - day_inve_vars.yaml
+#   vars_files:
+#     - day_inve_vars.yaml
 
-  tasks:
-    - name: Wait for SSH to be available
-      wait_for:
-        port: 22
-        delay: 10
-        timeout: 700
-        host: "{{ ansible_host | default(inventory_hostname) }}"
+#   tasks:
+#     - name: Wait for SSH to be available
+#       wait_for:
+#         port: 22
+#         delay: 10
+#         timeout: 700
+#         host: "{{ ansible_host | default(inventory_hostname) }}"
 
   
         
 
 # This Ansible playbook installs Docker and Docker Compose on AWS EC2 instances.
 - name: Install Docker and prerequisites
-  hosts: aws_ec2
+  hosts: all
   become: yes
   gather_facts: yes
 
@@ -60,7 +60,7 @@
 # which is compatible with the latest versions of Docker and provides better integration with the Docker CLI. 
 # This method is more reliable and future-proof compared to downloading a standalone binary.
 - name: Install Docker Compose
-  hosts: aws_ec2
+  hosts: all
   become: yes
 
   vars_files:

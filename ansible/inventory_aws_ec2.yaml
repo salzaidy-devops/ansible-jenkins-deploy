@@ -8,8 +8,8 @@ regions:
 
 filters:
   # filter instance that is dev, not prod
-  tag:Name: dev*
-  instance-state-name: running
+  # tag:Name: dev*
+  # instance-state-name: running
 
 # group instance by tags OR instance_type as example
 # then use this group insteas of pointing to all instances
